@@ -29,7 +29,7 @@ def get_filter_vec(filter_size):
 def build_gaussian_pyramid(im, max_levels, filter_size):
     filter_vec = get_filter_vec(filter_size)
     gaussian_array = [im]
-    for i in range(int(max_levels - 1)):
+    for i in range(max_levels - 1):
         if im.shape[0] < 16 or im.shape[1] < 16:
             break
         im = reduce(im, filter_size)
@@ -76,6 +76,34 @@ def laplacian_to_image(lpyr, filter_vec, coeff):
     return res
 
 
+def linear_stretch_pyramid(pyr, levels):
+    for i in range(levels):
+        pyr[i] = (pyr[i] - pyr[i].min()) / (pyr[i].max() - pyr[i].min())
+    return pyr
+
+
+def render_pyramid_helper(pyr, levels):
+    new_pyr = [pyr[0]]
+    for i in range(1, levels):
+        new_arr = np.zeros((pyr[0].shape[0], pyr[i].shape[1]))
+        new_arr[:pyr[i].shape[0]:, ::] = pyr[i]
+        new_pyr.append(new_arr)
+    return new_pyr
+
+
+def render_pyramid(pyr, levels):
+    stretched = linear_stretch_pyramid(pyr, levels)
+    res = render_pyramid_helper(stretched, levels)
+    img = np.hstack(res)
+    return img
+
+
+def display_pyramid(pyr, levels):
+    img = render_pyramid(pyr, levels)
+    plt.imshow(img, cmap="gray")
+    plt.show()
+
+
 def example():
     arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     # print(arr[::2, ::2])
@@ -100,18 +128,28 @@ if __name__ == '__main__':
     # print(get_filter_vec(4))
     # example()
     x = read_image("city.jpg", 1)
-    # m, n = build_gaussian_pyramid(x, 5, 3)
-    # plt.imshow(m[4], cmap="gray")
+    m, n = build_gaussian_pyramid(x, 3, 3)
+    # plt.imshow(m[0], cmap="gray")
     # plt.show()
-    m2, n2 = build_laplacian_pyramid(x, 5, 3)
+    m2, n2 = build_laplacian_pyramid(x, 3, 3)
     # plt.imshow(m2[0], cmap="gray")
     # plt.show()
     # print(m2[0].shape)
     # print(m2[1].shape)
     # print(m2[2].shape)
-    plt.subplot(2,2,1)
-    plt.imshow(x,cmap="gray")
-    img = laplacian_to_image(m2, get_filter_vec(3), [1, 1, 1, 1, 1])
-    plt.subplot(2,2,2)
-    plt.imshow(img, cmap="gray")
+
+    # plt.subplot(2, 2, 1)
+    # plt.imshow(x, cmap="gray")
+    # img = laplacian_to_image(m2, get_filter_vec(3), [1, 1, 1, 1, 1])
+    # plt.subplot(2, 2, 2)
+    # plt.imshow(img, cmap="gray")
+    #
+    # plt.show()
+
+    display_pyramid(m2, 3)
+
+    plt.subplot(2, 2, 1)
+    plt.imshow(m2[0], cmap="gray")
+    plt.subplot(2, 2, 2)
+    plt.imshow(m2[2], cmap="gray")
     plt.show()
