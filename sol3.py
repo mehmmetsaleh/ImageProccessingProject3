@@ -3,6 +3,11 @@ import numpy as np
 import skimage.color as sk
 from skimage import io
 import matplotlib.pyplot as plt
+import os
+
+
+def relpath(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
 
 
 def blur_reduce(im, filter_size):
@@ -104,12 +109,46 @@ def display_pyramid(pyr, levels):
     plt.show()
 
 
-def example():
-    arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    # print(arr[::2, ::2])
-    new_arr = np.zeros((2 * arr.shape[0], 2 * arr.shape[1]))
-    new_arr[::2, ::2] = arr
-    print(new_arr)
+def pyramid_blending(im1, im2, mask, max_levels, filter_size_im, filter_size_mask):
+    l1, filter_vec1 = build_laplacian_pyramid(im1, max_levels, filter_size_im)
+    l2, filter_vec2 = build_laplacian_pyramid(im2, max_levels, filter_size_im)
+    gaussian_mask, mask_filter_vec = build_gaussian_pyramid(mask.astype(np.float64), max_levels, filter_size_mask)
+    l_out = []
+    for k in range(max_levels):
+        lk = gaussian_mask[k] * l1[k] + (1.0 - gaussian_mask[k]) * l2[k]
+        if lk.shape[0] < 16 or lk.shape[1] < 16:
+            break
+        l_out.append(lk)
+
+    blended_im = laplacian_to_image(l_out, get_filter_vec(filter_size_im), [1] * len(l_out))
+    blended_clipped_im = np.clip(blended_im, 0, 1)
+    return blended_clipped_im
+
+
+def blending_example1():
+    im1 = read_image(relpath("externals/me.jpg"), 2)
+    im2 = read_image(relpath("externals/wick.jpg"), 2)
+    mask = read_image(relpath("externals/wick_mask.jpg"), 1)
+    blend_im = np.zeros(im1.shape)
+    blend_im[:, :, 0] = pyramid_blending(im1[:, :, 0], im2[:, :, 0], mask, 5, 3, 3)
+    blend_im[:, :, 1] = pyramid_blending(im1[:, :, 1], im2[:, :, 1], mask, 5, 3, 3)
+    blend_im[:, :, 2] = pyramid_blending(im1[:, :, 2], im2[:, :, 2], mask, 5, 3, 3)
+
+    plt.subplot(2, 2, 1)
+    plt.imshow(im1)
+    plt.subplot(2, 2, 2)
+    plt.imshow(im2)
+    plt.subplot(2, 2, 3)
+    plt.imshow(mask, cmap="gray")
+    plt.subplot(2, 2, 4)
+    plt.imshow(blend_im)
+    plt.show()
+
+    return im1, im2, mask, blend_im
+
+
+def blending_example2():
+    pass
 
 
 def read_image(filename, representation):
@@ -127,11 +166,11 @@ def read_image(filename, representation):
 if __name__ == '__main__':
     # print(get_filter_vec(4))
     # example()
-    x = read_image("city.jpg", 1)
-    m, n = build_gaussian_pyramid(x, 3, 3)
-    # plt.imshow(m[0], cmap="gray")
+    x = read_image("monkey2.jpeg", 1)
+    m, n = build_gaussian_pyramid(x, 5, 3)
+    # plt.imshow(m[4], cmap="gray")
     # plt.show()
-    m2, n2 = build_laplacian_pyramid(x, 3, 3)
+    m2, n2 = build_laplacian_pyramid(x, 5, 3)
     # plt.imshow(m2[0], cmap="gray")
     # plt.show()
     # print(m2[0].shape)
@@ -146,10 +185,19 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-    display_pyramid(m2, 3)
+    # display_pyramid(m, 5)
+    #
+    # plt.subplot(2, 2, 1)
+    # plt.imshow(m[0], cmap="gray")
+    # plt.subplot(2, 2, 2)
+    # plt.imshow(m[4], cmap="gray")
+    # plt.show()
+    #
+    # im1 = read_image("me.jpg", 1)
+    # im2 = read_image("wick.jpg", 1)
+    # mask = read_image("wick_mask.jpg", 1)
+    # blend = pyramid_blending(im1, im2, mask, 5, 3, 3)
+    # plt.imshow(blend, cmap="gray")
+    # plt.show()
 
-    plt.subplot(2, 2, 1)
-    plt.imshow(m2[0], cmap="gray")
-    plt.subplot(2, 2, 2)
-    plt.imshow(m2[2], cmap="gray")
-    plt.show()
+    # blending_example1()
