@@ -3,3 +3,9 @@ sol3.py
 answer_q1.txt
 answer_q2.txt
 answer_q3.txt
+externals/giraffe_final.jpg
+externals/giraffe_mask.jpg
+externals/wing_final.jpg
+externals/me.jpg
+externals/wick.jpg
+externals/wick_mask.jpg
