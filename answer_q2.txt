@@ -1,0 +1,3 @@
+the length of filter vector controls the divison of frequencies into bands.
+so whenever the filter size is big, bands get bigger and for instance on many
+frequencies we wont get blending effect.

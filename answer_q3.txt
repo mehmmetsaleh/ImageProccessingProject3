@@ -1,0 +1,1 @@
+max_level number controls how much blending to do on lower frequencies.
