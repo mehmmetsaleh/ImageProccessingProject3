@@ -126,7 +126,6 @@ def pyramid_blending(im1, im2, mask, max_levels, filter_size_im, filter_size_mas
 
 
 def blending_example1():
-
     im1 = read_image(relpath("externals/me.jpg"), 2)
     im2 = read_image(relpath("externals/wick.jpg"), 2)
     mask = read_image(relpath("externals/wick_mask.jpg"), 1)
@@ -145,11 +144,10 @@ def blending_example1():
     plt.imshow(blend_im)
     plt.show()
 
-    return im1, im2, mask, blend_im
+    return im1, im2, mask.astype(np.bool), blend_im
 
 
 def blending_example2():
-
     im1 = read_image(relpath("externals/wing_final.jpg"), 2)
     im2 = read_image(relpath("externals/giraffe_final.jpg"), 2)
     mask = read_image(relpath("externals/giraffe_mask.jpg"), 1)
@@ -168,7 +166,7 @@ def blending_example2():
     plt.imshow(blend_im)
     plt.show()
 
-    return im1, im2, mask, blend_im
+    return im1, im2, mask.astype(np.bool), blend_im
 
 
 def read_image(filename, representation):
@@ -181,43 +179,3 @@ def read_image(filename, representation):
         return im_g
     elif representation == 2:
         return im_float
-
-
-if __name__ == '__main__':
-    # print(get_filter_vec(4))
-    # example()
-    x = read_image("monkey2.jpeg", 1)
-    m, n = build_gaussian_pyramid(x, 5, 3)
-    # plt.imshow(m[4], cmap="gray")
-    # plt.show()
-    m2, n2 = build_laplacian_pyramid(x, 5, 3)
-    # plt.imshow(m2[0], cmap="gray")
-    # plt.show()
-    # print(m2[0].shape)
-    # print(m2[1].shape)
-    # print(m2[2].shape)
-
-    # plt.subplot(2, 2, 1)
-    # plt.imshow(x, cmap="gray")
-    # img = laplacian_to_image(m2, get_filter_vec(3), [1, 1, 1, 1, 1])
-    # plt.subplot(2, 2, 2)
-    # plt.imshow(img, cmap="gray")
-    #
-    # plt.show()
-
-    # display_pyramid(m, 5)
-    #
-    # plt.subplot(2, 2, 1)
-    # plt.imshow(m[0], cmap="gray")
-    # plt.subplot(2, 2, 2)
-    # plt.imshow(m[4], cmap="gray")
-    # plt.show()
-    #
-    # im1 = read_image("me.jpg", 1)
-    # im2 = read_image("wick.jpg", 1)
-    # mask = read_image("wick_mask.jpg", 1)
-    # blend = pyramid_blending(im1, im2, mask, 5, 3, 3)
-    # plt.imshow(blend, cmap="gray")
-    # plt.show()
-
-    # blending_example2()
