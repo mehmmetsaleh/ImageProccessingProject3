@@ -126,6 +126,7 @@ def pyramid_blending(im1, im2, mask, max_levels, filter_size_im, filter_size_mas
 
 
 def blending_example1():
+
     im1 = read_image(relpath("externals/me.jpg"), 2)
     im2 = read_image(relpath("externals/wick.jpg"), 2)
     mask = read_image(relpath("externals/wick_mask.jpg"), 1)
@@ -148,7 +149,26 @@ def blending_example1():
 
 
 def blending_example2():
-    pass
+
+    im1 = read_image(relpath("externals/wing_final.jpg"), 2)
+    im2 = read_image(relpath("externals/giraffe_final.jpg"), 2)
+    mask = read_image(relpath("externals/giraffe_mask.jpg"), 1)
+    blend_im = np.zeros(im1.shape)
+    blend_im[:, :, 0] = pyramid_blending(im1[:, :, 0], im2[:, :, 0], mask, 5, 3, 3)
+    blend_im[:, :, 1] = pyramid_blending(im1[:, :, 1], im2[:, :, 1], mask, 5, 3, 3)
+    blend_im[:, :, 2] = pyramid_blending(im1[:, :, 2], im2[:, :, 2], mask, 5, 3, 3)
+
+    plt.subplot(2, 2, 1)
+    plt.imshow(im1)
+    plt.subplot(2, 2, 2)
+    plt.imshow(im2)
+    plt.subplot(2, 2, 3)
+    plt.imshow(mask, cmap="gray")
+    plt.subplot(2, 2, 4)
+    plt.imshow(blend_im)
+    plt.show()
+
+    return im1, im2, mask, blend_im
 
 
 def read_image(filename, representation):
@@ -200,4 +220,4 @@ if __name__ == '__main__':
     # plt.imshow(blend, cmap="gray")
     # plt.show()
 
-    # blending_example1()
+    # blending_example2()
