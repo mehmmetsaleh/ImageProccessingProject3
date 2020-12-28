@@ -35,11 +35,11 @@ def build_gaussian_pyramid(im, max_levels, filter_size):
     filter_vec = get_filter_vec(filter_size)
     gaussian_array = [im]
     for i in range(max_levels - 1):
-        if im.shape[0] < 16 or im.shape[1] < 16:
+        if im.shape[0] <= 16 or im.shape[1] <= 16:  # TODO: update=> changed < to <=
             break
         im = reduce(im, filter_size)
         gaussian_array.append(im)
-    return gaussian_array, filter_vec
+    return gaussian_array, filter_vec / np.sum(filter_vec)  # TODO: update=> divided by sum of vector
 
 
 def expand(im, filter_size):
@@ -59,8 +59,11 @@ def blur_expand(im, filter_size):
 
 def build_laplacian_pyramid(im, max_levels, filter_size):
     pyr, filter_vec = build_gaussian_pyramid(im, max_levels, filter_size)
-    laplacian_arr = [pyr[0] - expand(pyr[1], filter_size)]
-    for i in range(1, max_levels - 1):
+    # laplacian_arr = [pyr[0] - expand(pyr[1], filter_size)]  # TODO: update=> deleted this line
+    laplacian_arr = []
+    # TODO: update=> included first laplacian level in the loop and changed "maxlevels" to "len(pyr)"
+    # TODO: inside the range
+    for i in range(len(pyr) - 1):
         laplacian_arr.append(pyr[i] - expand(pyr[i + 1], filter_size))
     laplacian_arr.append(pyr[-1])
     return laplacian_arr, filter_vec
